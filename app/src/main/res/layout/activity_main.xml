@@ -10,6 +10,7 @@
     tools:context="com.cn.zwb.youmesay.MainActivity">
 
     <TextView
+        android:id="@+id/tv_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Hello World!" />

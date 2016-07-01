@@ -118,12 +118,6 @@ public abstract class BaseRecyclerAdapter<T> extends RecyclerView.Adapter<BaseRe
                 }
             });
         }
-
-
-
-
-
-
         /**
          * 通过viewId获取控件
          *

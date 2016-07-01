@@ -1,12 +1,16 @@
 package com.cn.zwb.youmesay.ui.fragment;
 
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
+import com.chanven.lib.cptr.PtrClassicFrameLayout;
+import com.chanven.lib.cptr.PtrFrameLayout;
+import com.chanven.lib.cptr.PtrHandler;
+import com.chanven.lib.cptr.loadmore.OnLoadMoreListener;
+import com.chanven.lib.cptr.recyclerview.RecyclerAdapterWithHF;
 import com.cn.zwb.youmesay.R;
 import com.cn.zwb.youmesay.support.http.bean.HttpRequestResult;
-import com.cn.zwb.youmesay.support.widget.pullrefresh.PullToRefreshRecyclerView;
 import com.cn.zwb.youmesay.ui.adapter.BaseRecyclerAdapter;
 
 import java.util.ArrayList;
@@ -15,10 +19,12 @@ import java.util.List;
 /**
  * Created by zhangweibo on 2016/6/22.
  */
-public abstract class PullRefreshFragment<T> extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener, PullToRefreshRecyclerView.PagingableListener {
-    PullToRefreshRecyclerView pttrRefresh;
+public abstract class PullRefreshFragment<T> extends BaseFragment implements OnLoadMoreListener, PtrHandler {
+    PtrClassicFrameLayout ptrClassicFrameLayout;
+    RecyclerView mRecyclerView;
     private List<T> dataList;
     protected BaseRecyclerAdapter<T> adapter;
+    private RecyclerAdapterWithHF mAdapter;
     protected  int page;
 
     @Override
@@ -29,7 +35,8 @@ public abstract class PullRefreshFragment<T> extends BaseFragment implements Swi
 
     @Override
     public void initView(View view) {
-        pttrRefresh= (PullToRefreshRecyclerView) view.findViewById(R.id.pttr_refresh);
+        ptrClassicFrameLayout = (PtrClassicFrameLayout) view.findViewById(R.id.recycler_view_frame);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         initPullRefreshView();
     }
 
@@ -45,14 +52,11 @@ public abstract class PullRefreshFragment<T> extends BaseFragment implements Swi
         dataList=new ArrayList<>();
         adapter=getAdapter();
         adapter.updateList(dataList);
-        pttrRefresh.setSwipeEnable(true);
-        pttrRefresh.setLayoutManager(new LinearLayoutManager(getActivity()));
-        pttrRefresh.setOnRefreshListener(this);
-        if (isLoadMore()){
-            pttrRefresh.setPagingableListener(this);
-            pttrRefresh.onFinishLoading(true,false);
-        }
-        pttrRefresh.setAdapter(adapter);
+        mAdapter = new RecyclerAdapterWithHF((RecyclerView.Adapter) adapter);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setAdapter(mAdapter);
+        ptrClassicFrameLayout.setOnLoadMoreListener(this);
+        ptrClassicFrameLayout.setPtrHandler(this);
     }
 
 
@@ -68,16 +72,6 @@ public abstract class PullRefreshFragment<T> extends BaseFragment implements Swi
      */
     abstract void fetch();
 
-    @Override
-    public void onRefresh() {
-        page=1;
-        fetch();
-    }
-
-    @Override
-    public void onLoadMoreItems() {
-        fetch();
-    }
 
 
     public void notifyDataChanged(HttpRequestResult<List<T>> result){
@@ -90,13 +84,13 @@ public abstract class PullRefreshFragment<T> extends BaseFragment implements Swi
         adapter.notifyDataSetChanged();
         refreshComplete();
         //判断是否还要加载更多
-        if (isLoadMore()){
+      /*  if (isLoadMore()){
             if (result.getPage()<result.getTotalPage()){
                 pttrRefresh.onFinishLoading(true,false);
             }else{
                 pttrRefresh.onFinishLoading(false,false);
             }
-        }
+        }*/
     }
 
     /**
@@ -117,11 +111,19 @@ public abstract class PullRefreshFragment<T> extends BaseFragment implements Swi
 
     public void refreshComplete(){
 
-        pttrRefresh.setOnLoadMoreComplete();
-        pttrRefresh.setOnRefreshComplete();
+
+    }
+
+
+    @Override
+    public void loadMore() {
 
     }
 
 
 
+    @Override
+    public void onRefreshBegin(PtrFrameLayout frame) {
+
+    }
 }

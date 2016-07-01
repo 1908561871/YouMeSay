@@ -22,9 +22,6 @@ import java.util.List;
 public class BaseActivity extends AppCompatActivity {
 
     public final static String DATA = "data";
-
-
-
     private long exitTime = 0;
 
 
@@ -110,13 +107,6 @@ public class BaseActivity extends AppCompatActivity {
         tvMenu.setText(getResources().getString(title));
         tvMenu.setOnClickListener(onClickListener);
 
-    }
-
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
     }
 
 
